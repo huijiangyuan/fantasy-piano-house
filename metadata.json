@@ -1,0 +1,6 @@
+{
+  "name": "魔法键盘 (Magic Keyboard)",
+  "description": "一个为小朋友设计的趣味网页小游戏，把整个键盘变成充满魔力的钢琴！乱按也会有绚丽的图案和悦耳的音乐。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
