@@ -345,6 +345,9 @@ export default function App() {
               退出方式：按 <kbd className="bg-white px-2 py-1 rounded shadow-sm border border-gray-200 text-gray-800">ESC</kbd> 键 或 点击屏幕右上角退出
             </div>
           </motion.div>
+          <div className="absolute bottom-4 text-xs font-medium text-gray-400">
+            v1.0.1
+          </div>
         </div>
       </div>
     );
