@@ -164,14 +164,24 @@ export default function App() {
         return;
       }
 
-      // Block default actions
+      // Ignore modifier keys completely for generating notes
+      if (['Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'Tab', 'ContextMenu'].includes(e.key)) {
+        return;
+      }
+
+      // Prevent default actions to block browser shortcuts that interrupt the game
       e.preventDefault();
       e.stopPropagation();
 
       if (e.repeat) return; // Prevent OS key repeat triggering
 
-      // Allow max 3 keys pressed simultaneously
-      if (activeKeysRef.current.size >= 3 && !activeKeysRef.current.has(e.code)) {
+      // Skip generating notes if meta or alt are pressed (to avoid OS-level actions triggering piano notes)
+      if (e.metaKey || e.altKey) {
+        return;
+      }
+
+      // Allow more keys pressed simultaneously
+      if (activeKeysRef.current.size >= 10 && !activeKeysRef.current.has(e.code)) {
         return;
       }
       activeKeysRef.current.add(e.code);
@@ -226,12 +236,18 @@ export default function App() {
       activeKeysRef.current.delete(e.code);
     };
 
+    const handleBlur = () => {
+      activeKeysRef.current.clear();
+    };
+
     window.addEventListener('keydown', handleKeyDown, { capture: true });
     window.addEventListener('keyup', handleKeyUp, { capture: true });
+    window.addEventListener('blur', handleBlur);
     
     return () => {
       window.removeEventListener('keydown', handleKeyDown, { capture: true });
       window.removeEventListener('keyup', handleKeyUp, { capture: true });
+      window.removeEventListener('blur', handleBlur);
     };
   }, [gameState, exitGame, addParticle, nextTarget]);
 
