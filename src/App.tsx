@@ -171,21 +171,20 @@ export default function App() {
       // Ignore modifier and system keys for generating notes
       const ignoredKeys = [
         'Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'Tab', 'ContextMenu', 
-        'PrintScreen', 'ScrollLock', 'Pause', 'Insert', 'Home', 'End', 'PageUp', 'PageDown', 'OS', 'Clear'
+        'PrintScreen', 'ScrollLock', 'Pause', 'Insert', 'Home', 'End', 'PageUp', 'PageDown', 'OS', 'Clear', 'Dead', 'NumLock'
       ];
-      if (ignoredKeys.includes(e.key) || e.key.startsWith('F')) {
+      if (ignoredKeys.includes(e.key)) {
         return;
       }
 
+      // Allow F-keys to make sound in DJ mode, but ignore in other modes if desired.
+      // But user said "只要按了就发音" (as long as it's pressed it makes sound)
+      // We will let all non-ignored keys make sound.
+      
       if (e.repeat) return; // Prevent OS key repeat triggering
 
-      // Skip generating notes if modifier keys are pressed (to avoid OS-level actions triggering piano notes)
-      if (e.metaKey || e.altKey || e.ctrlKey) {
-        return;
-      }
-
-      // Allow more keys pressed simultaneously
-      if (activeKeysRef.current.size >= 10 && !activeKeysRef.current.has(e.code)) {
+      // Allow unlimited keys in DJ mode, limit to 10 otherwise
+      if (playModeRef.current !== 'dj' && activeKeysRef.current.size >= 10 && !activeKeysRef.current.has(e.code)) {
         return;
       }
       activeKeysRef.current.add(e.code);
@@ -350,7 +349,7 @@ export default function App() {
             </div>
           </motion.div>
           <div className="absolute bottom-4 text-xs font-medium text-gray-400">
-            v1.0.1
+            v1.0.2
           </div>
         </div>
       </div>
