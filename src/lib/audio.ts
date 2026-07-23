@@ -10,6 +10,21 @@ export function initAudio() {
   masterGain = audioCtx.createGain();
   masterGain.gain.value = 0.5; // Base volume
   masterGain.connect(audioCtx.destination);
+
+  // Browsers create the context in a "suspended" state until a user gesture.
+  // initAudio() is always called from a click/tap, so resume() here is trusted.
+  audioCtx.resume().catch(() => {});
+}
+
+/**
+ * Safely bring the AudioContext back to life after the tab lost focus
+ * (Alt-Tab away, minimized, screen lock, etc.) or after any user gesture.
+ * No-ops when there is no context or it is already running.
+ */
+export function resumeAudio() {
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
 }
 
 // 88 Piano key frequencies starting from C3 to keep a good range

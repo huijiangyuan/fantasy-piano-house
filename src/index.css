@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  /* Distinctive pairing (NOT Inter/Roboto/Arial): rounded display + humanist body.
+     CJK falls back to the system UI fonts so Chinese glyphs stay crisp. */
+  --font-display: "Fredoka", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+  --font-body: "Nunito", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+}
+
 @layer utilities {
   .text-stroke-2 {
     -webkit-text-stroke: 2px white;
@@ -18,10 +25,11 @@
   }
 }
 
+/* Aurora backdrop — keeps depth so we never fall back to flat white/grey. */
 .animate-magical-bg {
-  background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #d4fc79, #96e6a1);
+  background: linear-gradient(-45deg, #a1c4fd, #c2e9fb, #fecfef, #fcd5ce, #d4fc79, #96e6a1);
   background-size: 400% 400%;
-  animation: magical-gradient 12s ease infinite;
+  animation: magical-gradient 18s ease infinite;
 }
 
 body {
@@ -29,4 +37,6 @@ body {
   overflow: hidden; /* Prevent scrolling when mashing */
   user-select: none; /* Prevent text selection */
   touch-action: none;
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
 }
