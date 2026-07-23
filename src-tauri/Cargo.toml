@@ -1,0 +1,22 @@
+[package]
+name = "fantasy-piano-house"
+version = "1.1.0"
+description = "奇幻钢琴屋 - 儿童键盘钢琴 (桌面版)"
+authors = ["huijiangyuan"]
+edition = "2021"
+default-run = "fantasy-piano-house"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# 跨平台低层键盘钩子，macOS 底层即 CGEventTap。
+# grab() 回调返回 None 即可“吞掉”该按键事件（系统级拦截），
+# 返回 Some(event) 则放行给应用程序（网页钢琴借此发声）。
+rdev = "0.20"
+
+[features]
+default = []
