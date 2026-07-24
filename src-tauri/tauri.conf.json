@@ -39,10 +39,7 @@
     ],
     "macOS": {
       "minimumSystemVersion": "10.15",
-      "info": {
-        "NSAppleEventsUsageDescription": "奇幻钢琴屋需要辅助功能权限以在系统级拦截功能键与系统快捷键。",
-        "NSInputMonitoringUsageDescription": "奇幻钢琴屋需要输入监控权限以在系统级拦截功能键。"
-      }
+      "infoPlist": "Info.plist"
     }
   }
 }

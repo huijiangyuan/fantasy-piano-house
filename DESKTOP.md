@@ -49,6 +49,48 @@ npm run tauri build
 - 如需真正「锁死成单应用」，请用 **macOS 单应用模式（Single App Mode，需 Apple Configurator / MDM 监管设备）或引导式访问** 作为兜底。
 - Windows：`Ctrl+Alt+Del`、`Win+L` 同理保留。
 
+## 退出保险（借鉴 stretchly 的 strict 思路）
+
+纯靠 rdev 吞键还不够——用户仍能从红绿灯按钮 / 菜单 Quit 关掉窗口。
+因此又叠了 Tauri 原生事件的**三道保险**（见 `src-tauri/src/main.rs`）：
+
+1. **防关窗**：`on_window_event` 拦截 `CloseRequested` → `api.prevent_close()`，点关闭/最小化按钮没反应。
+2. **防退出 App**：`run()` 里拦截 `RunEvent::ExitRequested` → `api.prevent_exit()`，任何退出尝试都被拦下（前提是 `admin_exit` 标志未置位）。
+3. **管理员专属退出键**：`Cmd + Shift + Q`。所有带 `Cmd` 的组合默认被吞，唯独这个放行
+   并在钩子里通知主线程 `app_handle.exit(0)`；同时置位 `admin_exit` 标志让 `ExitRequested` 放行，
+   让大人能随时关程序，小孩乱按 `Cmd+Q/W/Tab/F1–F12` 全部无效。
+
+> stretchly 本身是「全屏盖屏（`setKiosk` + `setClosable(false)`），不抓键盘事件流」，
+> 仅在 strict 模式挡 `close` 与 `before-quit`。我们走的是「rdev 抓键 + Tauri 原生事件兜底」双轨，
+> 比 stretchly 更彻底（能吞掉 Cmd+Tab 之外的大部分系统键），但同样拦不住 macOS 系统保留键（见下）。
+
+## 构建踩坑与版本约束（实测有效组合）
+
+> 下面这些是沙箱内反复踩出来的坑，直接照抄版本即可，别随意升级。
+
+- **rdev 版本**：只能用 `0.5.3`（`features = ["unstable_grab"]`）。
+  `grab()` 需要 `unstable_grab` feature 才暴露；crates.io 上没有 `0.20` 之类的新版本，别照网上旧文写。
+- **rdev 0.5 的 `Event` 没有 `modifiers` 字段**（只有 `time` / `name` / `event_type`），
+  修饰键状态要在回调里用 `Cell<ModState>` 手动维护；否则闭包会变成 `FnMut` 触发
+  `E0525`（`grab` 要求 `Fn`），编译不过。
+- **`tauri.conf.json` 的 macOS 权限字段**：`tauri-build` 2.6.3 不认识旧式 `bundle.macOS.info`，
+  要用 `infoPlist: "Info.plist"` 指向独立 plist 文件（已新建 `src-tauri/Info.plist`，
+  内含 `NSAppleEventsUsageDescription` 与 `NSInputMonitoringUsageDescription` 中文授权文案）。
+- **Tauri 2.11 已移除 `set_menu_bar_visible`**：别照旧教程调这个方法，会 `E0599`；
+  菜单 Quit 已被 `ExitRequested` 拦截 + rdev 吞 `Cmd+Q` 双保险兜住，删掉不影响目标。
+- **DMG 打包**：Tauri 默认 `bundle_dmg.sh` 用 `osascript`（Finder GUI 脚本）摆窗口，
+  **无头/沙箱环境跑不起来**。改用纯 `hdiutil` 手工生成即可：
+
+  ```bash
+  cd src-tauri/target/release/bundle/macos
+  hdiutil create -volname "奇幻钢琴屋" \
+    -srcfolder "奇幻钢琴屋.app" \
+    -format UDZO \
+    "../dmg/奇幻钢琴屋_1.1.0_aarch64.dmg"
+  ```
+
+  本地有 GUI 时直接 `npm run tauri build` 会一并产出 `.app` 与 `.dmg`。
+
 ## 拦截规则（`src-tauri/src/main.rs`）
 
 | 按键 | 处理 |
@@ -64,10 +106,13 @@ npm run tauri build
 
 ```
 src-tauri/
-├── Cargo.toml          # Rust 依赖（tauri + rdev）
+├── Cargo.toml          # Rust 依赖（tauri ^2 + rdev 0.5.3/unstable_grab）
+├── Cargo.lock          # 锁定依赖（已提交）
 ├── build.rs
-├── tauri.conf.json     # 窗口/打包/权限描述配置
-└── src/main.rs         # 键盘守卫（CGEventTap 封装）
+├── tauri.conf.json     # 窗口/打包配置，macOS 指向 infoPlist
+├── Info.plist          # 独立权限描述（辅助功能/输入监控文案）
+├── icons/              # npx tauri icon 生成的各尺寸图标
+└── src/main.rs         # 键盘守卫 + 三道退出保险（CGEventTap 封装）
 DESKTOP.md              # 本文件
 ```
 

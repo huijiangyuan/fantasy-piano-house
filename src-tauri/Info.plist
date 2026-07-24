@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>NSAppleEventsUsageDescription</key>
+  <string>奇幻钢琴屋需要辅助功能权限以在系统级拦截功能键与系统快捷键。</string>
+  <key>NSInputMonitoringUsageDescription</key>
+  <string>奇幻钢琴屋需要输入监控权限以在系统级拦截功能键。</string>
+</dict>
+</plist>
