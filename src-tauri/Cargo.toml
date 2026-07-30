@@ -13,11 +13,13 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-# 跨平台低层键盘钩子，macOS 底层即 CGEventTap。
-# 需开启 unstable_grab feature 才能用 grab()：回调返回 None 即“吞掉”该按键事件
-# （系统级拦截），返回 Some(event) 则放行给应用程序（网页钢琴借此发声）。
-# rdev 0.5 的 Event 不含 modifiers 字段，修饰键状态需在回调内手动维护。
-rdev = { version = "0.5.3", features = ["unstable_grab"] }
+# 直接复用 rdev 0.5.3 同版本的 CoreGraphics / Cocoa 裸绑定，
+# 自行实现 HID 级 CGEventTap（kCGHIDEventTap），理由：
+#   - rdev 的 grab 一旦被系统临时禁用（kCGEventTapDisabledByEventTap）不会自愈，
+#     导致 F1–F12 等功能键漏拦；自管 tap 可在回调里收到禁用事件后 CGEventTapEnable 重新启用。
+#   - 直接在回调里读 CGEventGetFlags 判断 Cmd 组合，无需像 rdev 那样手动维护修饰键状态。
+core-graphics = { version = "0.19", features = ["highsierra"] }
+cocoa = "0.22"
 
 [features]
 default = []

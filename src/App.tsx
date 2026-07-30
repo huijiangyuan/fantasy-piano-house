@@ -200,15 +200,9 @@ export default function App() {
       // Resume audio on a trusted user gesture (covers focus return too).
       resumeAudio();
 
-      // Exit condition (Escape key)
-      if (e.key === 'Escape') {
-        exitGame();
-        return;
-      }
-
       // Ignore modifier and system keys for generating notes
       const ignoredKeys = [
-        'Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'Tab', 'ContextMenu',
+        'Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'Tab', 'ContextMenu', 'Escape',
         'PrintScreen', 'ScrollLock', 'Pause', 'Insert', 'Home', 'End', 'PageUp', 'PageDown', 'OS', 'Clear', 'Dead', 'NumLock'
       ];
       if (ignoredKeys.includes(e.key)) {
@@ -397,7 +391,7 @@ export default function App() {
             </button>
 
             <div className="mt-7 relative text-sm font-semibold text-slate-500 bg-white/60 px-4 py-2 rounded-xl inline-block">
-              退出方式：按 <kbd className="bg-white px-2 py-0.5 rounded shadow-sm border border-slate-200 text-slate-700">ESC</kbd> 键 或 点右上角退出
+              游戏中可点右上角「退出游戏」按钮返回本页
             </div>
           </motion.div>
           <div className="absolute bottom-4 text-xs font-semibold text-white/70 drop-shadow">
@@ -436,7 +430,7 @@ export default function App() {
                 className="text-xs font-bold text-slate-500 bg-white/60 hover:bg-white px-4 py-2 rounded-xl italic shadow-sm transition-colors border border-white/50 flex items-center cursor-pointer"
               >
                 <X size={14} className="mr-1" />
-                退出游戏 (ESC)
+                退出游戏
               </button>
             </div>
           </header>
